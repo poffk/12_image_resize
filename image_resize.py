@@ -1,6 +1,8 @@
 import argparse
 import os.path
 from PIL import Image
+import logging
+from sys import exit
 
 
 def argparser():
@@ -32,8 +34,8 @@ def resize_image(image, width, height, scale):
     elif height:
         image = image.resize((round(height * proportion), height))
     elif width and height:
-        if width / height != proportion:
-            print('Пропорции не совпадают с исходным изображением')
+        if round(width / height, 2) != round(proportion, 2):
+            logging.error('Пропорции не совпадают с исходным изображением')
         image = image.resize((width, height))
     return image
 
@@ -48,11 +50,11 @@ def save_image(image, path_to_original, path_to_result):
 if __name__ == '__main__':
     parser = argparser()
     if not os.path.exists(parser.path_to_input_image):
-        print('Файл не найден')
+        exit('Файл не найден')
     elif not (parser.width or parser.height or parser.scale):
-        print('А что делать то? Никакие опции не указаны')
+        exit('Никакие опции для работы с изображением не указаны')
     elif parser.scale and (parser.width or parser.height):
-        print('Если указан масштаб, то ширина и высота указаны быть не могут')
+        exit('Если указан масштаб, то ширина и высота указаны быть не могут')
     else:
         user_image = open_image(parser.path_to_input_image)
         formatted_image = resize_image(user_image, parser.width, parser.height, parser.scale)
